@@ -1,0 +1,19 @@
+.alert-Connecting {
+  background-color: orange;
+}
+
+.alert-Connected {
+  background-color: green;
+}
+
+.alert-Disconnected {
+  background-color: red;
+}
+.nav-link {
+  color: rgb(115, 99, 99) !important;
+  cursor: pointer;
+}
+
+.nav-link.active {
+  color: #000000 !important;
+}

@@ -1,0 +1,204 @@
+<div class="container mt-4">
+  <div class="container mt-4" *ngIf="data">
+    <div class="d-flex justify-content-between align-items-center">
+      <div class="flex-grow-1">
+        <div>
+          <h2>Current Asset: {{ data.fromAsset.name }}</h2>
+          <p>Quantity: {{ data.fromAsset.quantity }}</p>
+          <p>
+            {{ data.fromAsset.dateCreatedLocal | date : "yyyy-MM-dd HH:mm:ss" }}
+          </p>
+        </div>
+      </div>
+
+      <div
+        class="alert"
+        [ngClass]="
+          'alert-' +
+          (connectionStatus === 'Connected'
+            ? 'success'
+            : connectionStatus === 'Disconnected'
+            ? 'danger'
+            : 'warning')
+        "
+        role="alert"
+      >
+        {{ connectionStatus }}
+      </div>
+    </div>
+
+    <ul class="nav nav-tabs mt-4">
+      <li class="nav-item">
+        <a
+          class="nav-link"
+          [ngClass]="{ active: activeTab === 'tradingPairs' }"
+          (click)="activeTab = 'tradingPairs'"
+          style="cursor: pointer"
+        >
+          Trading Pairs
+        </a>
+      </li>
+      <li class="nav-item">
+        <a
+          class="nav-link"
+          [ngClass]="{ active: activeTab === 'transactions' }"
+          (click)="activeTab = 'transactions'"
+          style="cursor: pointer"
+        >
+          Transactions
+        </a>
+      </li>
+      <li class="nav-item">
+        <a
+          class="nav-link"
+          [ngClass]="{ active: activeTab === 'charts' }"
+          (click)="activeTab = 'charts'"
+          style="cursor: pointer"
+        >
+          History
+        </a>
+      </li>
+    </ul>
+
+    <div class="tab-content mt-3">
+      <div *ngIf="activeTab === 'tradingPairs'">
+        <div class="pt-4 pb-4">
+          <table class="table table-striped">
+            <thead>
+              <tr>
+                <th></th>
+                <th>Name</th>
+                <th>Trade Price</th>
+                <th>Price</th>
+                <th>Quantity</th>
+                <th>Target Quantity</th>
+                <th>Quantity Percentage Diff</th>
+                <th>Current USDT profit</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let pair of data.fromAsset.toAssets">
+                <td>
+                  <span
+                    class="pr-2"
+                    [ngClass]="{
+                      'bg-light text-danger': !pair.actionPossibility,
+                      'bg-light text-success': pair.actionPossibility
+                    }"
+                  >
+                    {{ pair.actionName }}
+                  </span>
+                </td>
+                <td>
+                  <span>{{ pair.name }} ({{ pair.tradeQuantity }})</span>
+                </td>
+                <td>
+                  {{ pair.tradePrice | number : "1.6-6" }}
+                </td>
+                <td>
+                  <span class="pr-4">
+                    <i *ngIf="pair.priceUp" class="fas fa-arrow-down"></i>
+                    <i *ngIf="!pair.priceUp" class="fas fa-arrow-up"></i> </span
+                  ><span class="pr-2">{{
+                    pair.currentPrice | number : "1.6-6"
+                  }}</span>
+                  <span
+                    >({{
+                      pair.pricePercentageDiff * 100 | number : "1.2-2"
+                    }}%)</span
+                  >
+                </td>
+                <td>
+                  <span>
+                    {{ pair.currentQuantity }}
+                  </span>
+                  /<span
+                    [ngClass]="{
+                      'bg-light text-success':
+                        pair.currentQuantityWithFee > pair.targetQuantity,
+                      'bg-light text-danger':
+                        pair.currentQuantityWithFee < pair.targetQuantity
+                    }"
+                  >
+                    {{ pair.currentQuantityWithFee }}
+                  </span>
+                </td>
+                <td>
+                  <span>
+                    {{ pair.targetQuantity }}
+                  </span>
+
+                  <span *ngIf="pair.roundsCheck > 0"
+                    >({{ pair.roundsCheck }}/{{ data.totalRoundsCheck }})</span
+                  >
+                </td>
+                <td>
+                  <span>
+                    {{ pair.quantityPercentageDiff * 100 | number : "1.2-2" }}%
+                    /
+                    <span *ngIf="pair.actionName === 'Sell'">
+                      {{ pair.thresholdSell * 100 }}%
+                    </span>
+                    <span *ngIf="pair.actionName === 'Buy'">
+                      {{ pair.thresholdBuy * 100 }}%
+                    </span>
+                  </span>
+                </td>
+                <td>
+                  <span
+                    [ngClass]="{
+                      'bg-light text-success': pair.profitQuantityUSDT > 0,
+                      'bg-light text-danger': pair.profitQuantityUSDT < 0
+                    }"
+                  >
+                    {{ pair.profitQuantityUSDT | number : "1.2-2" }}
+                  </span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div *ngIf="activeTab === 'transactions'">
+        <div class="pt-4 pb-4">
+          <table class="table table-striped">
+            <thead>
+              <tr>
+                <th>Action</th>
+                <th>Date</th>
+                <th>From Asset</th>
+                <th>To Asset</th>
+                <th>Price</th>
+                <th>Previous Price</th>
+                <th>Quantity</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let transaction of data.transactions">
+                <td>{{ transaction.actionName || "N/A" }}</td>
+                <td>
+                  {{
+                    transaction.dateCreatedLocal | date : "yyyy-MM-dd HH:mm:ss"
+                  }}
+                </td>
+                <td>{{ transaction.fromAssetName }}</td>
+                <td>{{ transaction.toAssetName || "N/A" }}</td>
+                <td>{{ transaction.price || "N/A" }}</td>
+                <td>{{ transaction.previousPrice || "N/A" }}</td>
+                <td>{{ transaction.quantity || "N/A" }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div *ngIf="activeTab === 'charts'">
+        <app-history-chart
+          class="pt-4 pb-4"
+          [historyAssets]="data.historyAssets"
+        ></app-history-chart>
+      </div>
+    </div>
+  </div>
+</div>
