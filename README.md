@@ -16,11 +16,14 @@ However, if the market price drops, that is beyond the bot's control.</br>
     <li><strong>Backup Funds</strong>: Only use funds you can afford to lose, as the bot cannot prevent losses during price drops.</li>
     <li><strong>System Dependencies</strong>: The bot relies on stable internet, exchange APIs, and server uptime, which may affect performance.</li>
 </ul>
-</strong></br></br>
+</strong>
+<h2>Overview</h2> 
+<p>This trading bot is designed to make trades based on potential increases in asset quantity. It begins by reading your portfolio balance, identifying the asset with the highest USDT value, and calculating the target amount based on the current quantity and a predefined threshold. The bot continuously monitors prices for relevant trading pairs, comparing each asset with others and tracking price changes on a scheduled basis.
+When a buy action is triggered based on set thresholds, the bot waits for the price to decrease to a specified level before executing the purchase. Similarly, for a sell action, the bot completes the transaction once the price reaches the desired target.
 
-<h2>Overview</h2>
-<p>The bot is designed to analyze account information and identify the cryptocurrency with the highest quantity in USDT value. It retrieves current prices for relevant trading pairs, comparing each with other assets, and monitors price changes on a scheduled basis. Based on predefined thresholds, if a buy action is triggered, the bot will wait for a price decrease to reach the specified threshold before executing the purchase. Similarly, for a sell action, the bot will execute once the price increases to the desired level.</p>
+If the price moves against the desired outcome and there are no favorable trade opportunities, the bot remains idle until the price aligns with the target. <b>Each transaction aims to increase the quantity of assets held</b>; however, profit in USDT or EUR is not guaranteed due to potential price fluctuations. Patience is key.
 
+For example, if you hold BTC and buy ETH, the quantity of ETH may increase. However, if the ETH/EUR price drops more significantly than the BTC/EUR price, your total balance in EUR may decrease.</p>
 <p><strong>The bot calculates the estimated trading fees</strong>, and the threshold is based on how the current quantity, with fees considered, exceeds the desired amount. Given the rapid nature of transactions, it cannot guarantee execution at the exact target price. To address this, three proactive measures are in place:</p>
 <ul>
     <li><strong>Rounds Check</strong>: The bot waits for prices to stabilize before executing a trade, improving trade accuracy.</li>
