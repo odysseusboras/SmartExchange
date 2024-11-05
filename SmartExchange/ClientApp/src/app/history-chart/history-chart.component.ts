@@ -89,9 +89,6 @@ export class HistoryChartComponent
     );
 
     const option = {
-      title: {
-        text: `${asset.name} Quantity Over Time`,
-      },
       tooltip: {
         trigger: 'axis',
         axisPointer: {

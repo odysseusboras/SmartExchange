@@ -11,11 +11,11 @@ namespace SmartExchange
 {
     public class ScheduledJobService : BackgroundService
     {
-        private ExchangeManager _exchangeManager;
+        private ExchangeManager? _exchangeManager;
         private readonly AppSettings _settings;
-        private ITradingProvider _tradingProvider;
-        private ExchangeDBContext _dbContext;
-        private TradingHubService _tradingHubService;
+        private ITradingProvider? _tradingProvider;
+        private ExchangeDBContext? _dbContext;
+        private TradingHubService? _tradingHubService;
         private readonly IServiceScopeFactory _serviceScopeFactory;
         public static CancellationToken CancellationToken { get; private set; }
         public ScheduledJobService(IOptions<AppSettings> settings, IServiceScopeFactory serviceScopeFactory)

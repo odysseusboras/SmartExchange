@@ -15,6 +15,8 @@ namespace SmartExchange.Business
         private readonly ITradingProvider _tradingProvider;
         private readonly AppSettings _settings;
         private readonly TradingHubService _tradingHubService;
+        private IEnumerable<PairInfo>? pairs;
+        private FromAsset fromAsset { get; set; } = new FromAsset();
 
         public ExchangeManager(ExchangeDBContext dbContext, ITradingProvider tradingProvider, AppSettings settings, TradingHubService tradingHubService)
         {
@@ -22,18 +24,13 @@ namespace SmartExchange.Business
             _tradingProvider = tradingProvider;
             _settings = settings;
             _tradingHubService = tradingHubService;
-
         }
 
-        private IEnumerable<PairInfo>? pairs;
-        private FromAsset fromAsset { get; set; }
         public async Task Initialize()
         {
             pairs ??= await _tradingProvider.GetAllPairs(_settings.Assets ?? []);
 
-            FromAsset? latestFromAsset = await _dbContext.GetLatestStepAsync();
-
-            fromAsset = latestFromAsset ?? await GetStartingAsset();
+            fromAsset = await _dbContext.GetLatestStepAsync() ?? await GetStartingAsset() ?? throw new Exception("From asset cannot be empty");
 
             await _dbContext.LogCurrentStep(fromAsset);
         }
@@ -49,7 +46,6 @@ namespace SmartExchange.Business
                 })
                 .ToDictionary(result => result.Name, result => result.MaxQuantity);
 
-
             IEnumerable<PairInfo> pairsInfo = Helpers.GetRelevantPairs(pairs ?? [], fromAsset, _settings.Assets);
 
             foreach (PairInfo pair in pairsInfo)
@@ -58,7 +54,7 @@ namespace SmartExchange.Business
 
                 decimal USDTprice = (toAsset.Name != "USDT") ? await _tradingProvider.GetPairPriceAsync($"{toAsset.Name}USDT") : 1;
 
-                ConfigPair? configPair = _settings.Assets.FirstOrDefault(x => x.Name == pair.Name) ?? throw new Exception();
+                ConfigPair configPair = _settings.Assets.First(x => x.Name == pair.Name);
 
                 decimal currentPrice = await _tradingProvider.GetPairPriceAsync(pair.Name);
 
@@ -79,7 +75,6 @@ namespace SmartExchange.Business
         #region Helpers       
         private bool WorthAction(ToAsset toAsset)
         {
-
             bool percentageCheck = toAsset.QuantityPercentageDiff > (toAsset.Action == TransactionAction.Sell ? toAsset.ThresholdSell : toAsset.ThresholdBuy);
 
             if (toAsset.CurrentQuantityWithFee > toAsset.TargetQuantity && percentageCheck)

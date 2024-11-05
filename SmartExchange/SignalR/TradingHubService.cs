@@ -20,8 +20,5 @@ namespace SmartExchange.SignalR
 
             await _hubContext.Clients.All.SendAsync("ReceiveMessage", overview);
         }
-
-
     }
-
 }

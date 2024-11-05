@@ -32,6 +32,8 @@ namespace SmartExchange.Model.ORM
         public decimal QuantityPercentageDiff { get; set; } = 0;
         public decimal ThresholdBuy { get; set; } = 0;
         public decimal ThresholdSell { get; set; } = 0;
+        [NotMapped]
+        public decimal TargetPrice { get => TargetQuantity / FromAsset?.Quantity ?? throw new Exception("From asset cannot be empty"); set { } }
 
         [NotMapped]
         public string ActionName { get => Action.ToString(); set { } }
@@ -50,17 +52,17 @@ namespace SmartExchange.Model.ORM
         public void SetValues(decimal price, decimal USDTprice, Dictionary<string, decimal> maxQuantities, decimal thresholdSell, decimal thresholdBuy)
         {
             _ = maxQuantities.TryGetValue(Name, out decimal maxQuantity);
-            decimal toQuantity = Action == TransactionAction.Buy ? MathExtensions.Round(FromAsset.Quantity / price, StepSize) : MathExtensions.Round(FromAsset.Quantity, StepSize);
+            decimal toQuantity = Action == TransactionAction.Buy ? MathExtensions.Round(FromAsset?.Quantity ?? 0 / price, StepSize) : MathExtensions.Round(FromAsset?.Quantity ?? 0, StepSize);
             TradePrice = (TradePrice == 0) ? price : TradePrice;
             TradeQuantity = toQuantity;
             PreviousPrice = CurrentPrice;
             CurrentPrice = price;
-            CurrentQuantity = Action == TransactionAction.Sell ? CurrentPrice * TradeQuantity : MathExtensions.Round(FromAsset.Quantity / CurrentPrice, StepSize);
+            CurrentQuantity = Action == TransactionAction.Sell ? CurrentPrice * TradeQuantity : MathExtensions.Round(FromAsset?.Quantity ?? 0 / CurrentPrice, StepSize);
             CurrentQuantityWithFee = CurrentQuantity - (CurrentQuantity * 0.001M);
             TargetQuantity = (maxQuantity == 0) ? Math.Max(CurrentQuantity, maxQuantity) : maxQuantity;
             PricePercentageDiff = Math.Abs(CurrentPrice - TradePrice) / TradePrice;
             profitQuantityUSDT = (TradeQuantity == 0) ? 0 : USDTprice * (CurrentQuantityWithFee - TargetQuantity);
-            QuantityPercentageDiff = (CurrentQuantityWithFee - TargetQuantity) / TargetQuantity;
+            QuantityPercentageDiff = (CurrentQuantity == 0) ? 0 : (CurrentQuantityWithFee - TargetQuantity) / TargetQuantity;
             ThresholdBuy = thresholdBuy;
             ThresholdSell = thresholdSell;
 

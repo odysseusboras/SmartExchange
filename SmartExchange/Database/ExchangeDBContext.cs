@@ -67,11 +67,11 @@ namespace SmartExchange.Database
 
         public async Task LogTransaction(FromAsset fromAsset)
         {
-            ToAsset? toAsset = fromAsset.ToAssets.FirstOrDefault(x => x.Selected);
+            ToAsset toAsset = fromAsset.ToAssets.First(x => x.Selected);
             Transaction transaction = new()
             {
                 Quantity = toAsset?.TradeQuantity,
-                Action = toAsset.Action,
+                Action = toAsset?.Action ?? throw new Exception("To asset cannot be empty"),
                 FromAssetName = fromAsset?.Name,
                 ToAssetName = toAsset?.Name,
                 Price = toAsset?.CurrentPrice,
