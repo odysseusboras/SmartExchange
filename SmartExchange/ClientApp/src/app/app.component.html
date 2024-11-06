@@ -94,33 +94,20 @@
                 <span>{{ pair.name }} ({{ pair.tradeQuantity }})</span>
               </td>
               <td>
-                <span
-                  [ngClass]="{
-                    'bg-light text-success':
-                      pair.currentPrice > pair.previousPrice,
-                    'bg-light text-danger':
-                      pair.currentPrice < pair.previousPrice
-                  }"
-                >
+                <span>
                   <i *ngIf="pair.priceUp" class="fas fa-arrow-down"></i>
                   <i *ngIf="!pair.priceUp" class="fas fa-arrow-up"></i>
                 </span>
-                {{ pair.tradePrice | number : "1.10-10" }}
+                {{ pair.tradePrice | number : "1.8-8" }}
               </td>
               <td>
-                <span
-                  [ngClass]="{
-                    'bg-light text-success':
-                      pair.currentPrice > pair.targetPrice,
-                    'bg-light text-danger': pair.currentPrice < pair.targetPrice
-                  }"
-                >
-                  {{ pair.currentPrice | number : "1.10-10" }}
+                <span>
+                  {{ pair.currentPrice | number : "1.8-8" }}
                 </span>
                 ({{ pair.pricePercentageDiff * 100 | number : "1.4-4" }}%)
               </td>
               <td>
-                {{ pair.targetPrice | number : "1.10-10" }}
+                {{ pair.targetPrice | number : "1.8-8" }}
               </td>
               <td>
                 <span>
