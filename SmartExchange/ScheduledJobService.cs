@@ -12,6 +12,7 @@ namespace SmartExchange
     public class ScheduledJobService : BackgroundService
     {
         private ExchangeManager? _exchangeManager;
+        private NewPairManager? _newPairManager;
         private readonly AppSettings _settings;
         private ITradingProvider? _tradingProvider;
         private ExchangeDBContext? _dbContext;
@@ -35,6 +36,13 @@ namespace SmartExchange
 
             _exchangeManager = new ExchangeManager(_dbContext, _tradingProvider, _settings, _tradingHubService);
 
+            _newPairManager = new NewPairManager(_dbContext, _tradingProvider, _settings, _tradingHubService);
+
+            if (_settings.BinanceNewPairAdded)
+            {
+                await _newPairManager.Initialize();
+            }
+
             await _exchangeManager.Initialize();
 
             while (!CancellationToken.IsCancellationRequested)
@@ -42,6 +50,11 @@ namespace SmartExchange
                 try
                 {
                     await _exchangeManager.RunAsync();
+
+                    if (_settings.BinanceNewPairAdded)
+                    {
+                        await _newPairManager.RunAsync();
+                    }
                 }
                 catch
                 {

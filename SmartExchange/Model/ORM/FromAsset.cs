@@ -10,6 +10,7 @@ namespace SmartExchange.Model.ORM
     {
         public string? Name { get; set; }
         public decimal Quantity { get; set; } = 0;
+        public decimal TotalQuantityUSDT { get; set; } = 0;
         public List<ToAsset> ToAssets { get; set; } = [];
         public ToAsset GetToAsset(PairInfo pair)
         {
@@ -40,7 +41,8 @@ namespace SmartExchange.Model.ORM
             FromAsset cloned = new()
             {
                 Name = Name,
-                Quantity = Quantity
+                Quantity = Quantity,
+                TotalQuantityUSDT = TotalQuantityUSDT,
             };
 
             foreach (ToAsset toAsset in ToAssets)
@@ -61,6 +63,9 @@ namespace SmartExchange.Model.ORM
             _ = builder.HasIndex(c => c.Name);
 
             _ = builder.Property(e => e.Quantity)
+                .HasPrecision(20, 8);
+
+            _ = builder.Property(e => e.TotalQuantityUSDT)
                 .HasPrecision(20, 8);
 
             base.Configure(builder);

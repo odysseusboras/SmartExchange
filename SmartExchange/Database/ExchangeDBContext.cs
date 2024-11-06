@@ -14,6 +14,10 @@ namespace SmartExchange.Database
         public DbSet<ToAsset> ToAssets { get; set; }
         public DbSet<AssetHistory> AssetHistories { get; set; }
         public DbSet<AssetHistoryItem> AssetHistoryItems { get; set; }
+        public DbSet<Pair> Pairs { get; set; }
+        public DbSet<NewAsset> NewAsset { get; set; }
+
+
         private readonly AppSettings _settings;
 
         public ExchangeDBContext(DbContextOptions<ExchangeDBContext> options, IOptions<AppSettings> settings)
@@ -111,7 +115,7 @@ namespace SmartExchange.Database
 
             fromAsset.ToAssets = fromAsset.ToAssets
                 .OrderByDescending(x => x.ActionPossibility)
-                .ThenByDescending(x => x.profitQuantityUSDT)
+                .ThenByDescending(x => x.ProfitQuantityUSDT)
                 .ToList();
 
             List<Transaction> transactions = Transactions

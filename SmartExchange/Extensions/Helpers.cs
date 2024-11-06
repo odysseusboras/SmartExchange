@@ -16,7 +16,7 @@ namespace SmartExchange.Extensions
                 .OrderByDescending(x =>
                 {
                     ToAsset? toAsset = fromAsset.ToAssets.FirstOrDefault(toAsset => toAsset.Name == x.FromCoinName || toAsset.Name == x.ToCoinName);
-                    return toAsset?.profitQuantityUSDT ?? 0;
+                    return toAsset?.ProfitQuantityUSDT ?? 0;
                 });
 
         }

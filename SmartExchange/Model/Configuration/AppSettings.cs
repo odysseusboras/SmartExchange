@@ -11,17 +11,18 @@
     public class ConfigPair
     {
         public required string Name { get; set; }
-        public decimal ThresholdBuy { get; set; } = 0.005m;
-        public decimal ThresholdSell { get; set; } = 0.002m;
+        public decimal ThresholdBuy { get; set; } = 0;
+        public decimal ThresholdSell { get; set; } = 0;
     }
     public class AppSettings
     {
         public TradingProvider? TradingProvider { get; set; }
         public int Interval { get; set; }
         public int RoundsCheck { get; set; } = 3;
-        public List<ConfigPair> Assets { get; set; } = [];
+        public List<ConfigPair> Pairs { get; set; } = [];
         public bool StopOnError { get; set; } = false;
         public bool DebugMode { get; set; } = false;
+        public bool BinanceNewPairAdded { get; set; } = false;
 
     }
 }

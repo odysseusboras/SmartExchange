@@ -9,7 +9,7 @@ using SmartExchange.TradingProviders.Model;
 
 namespace SmartExchange.Business
 {
-    public partial class ExchangeManager
+    public class ExchangeManager
     {
         private readonly ExchangeDBContext _dbContext;
         private readonly ITradingProvider _tradingProvider;
@@ -28,7 +28,7 @@ namespace SmartExchange.Business
 
         public async Task Initialize()
         {
-            pairs ??= await _tradingProvider.GetAllPairs(_settings.Assets ?? []);
+            pairs ??= await _tradingProvider.GetAllPairs(_settings.Pairs ?? []);
 
             fromAsset = await _dbContext.GetLatestStepAsync() ?? await GetStartingAsset() ?? throw new Exception("From asset cannot be empty");
 
@@ -46,15 +46,20 @@ namespace SmartExchange.Business
                 })
                 .ToDictionary(result => result.Name, result => result.MaxQuantity);
 
-            IEnumerable<PairInfo> pairsInfo = Helpers.GetRelevantPairs(pairs ?? [], fromAsset, _settings.Assets);
+            IEnumerable<PairInfo> pairsInfo = Helpers.GetRelevantPairs(pairs ?? [], fromAsset, _settings.Pairs);
+
+
+            decimal USDTprice = (fromAsset.Name != "USDT") ? await _tradingProvider.GetPairPriceAsync($"{fromAsset.Name}USDT") : 1;
+
+            fromAsset.TotalQuantityUSDT = USDTprice * fromAsset.Quantity;
 
             foreach (PairInfo pair in pairsInfo)
             {
                 ToAsset toAsset = fromAsset.GetToAsset(pair);
 
-                decimal USDTprice = (toAsset.Name != "USDT") ? await _tradingProvider.GetPairPriceAsync($"{toAsset.Name}USDT") : 1;
+                USDTprice = (toAsset.Name != "USDT") ? await _tradingProvider.GetPairPriceAsync($"{toAsset.Name}USDT") : 1;
 
-                ConfigPair configPair = _settings.Assets.First(x => x.Name == pair.Name);
+                ConfigPair configPair = _settings.Pairs.First(x => x.Name == pair.Name);
 
                 decimal currentPrice = await _tradingProvider.GetPairPriceAsync(pair.Name);
 
@@ -131,7 +136,7 @@ namespace SmartExchange.Business
 
             Thread.Sleep(100);
 
-            _ = await GetStartingAsset();
+            fromAsset = await GetStartingAsset();
 
             await RunAsync();
 
@@ -140,7 +145,7 @@ namespace SmartExchange.Business
         }
         private async Task<FromAsset> GetStartingAsset()
         {
-            AccountInfo accountInfoDTO = await _tradingProvider.GetAccountInfo(_settings.Assets);
+            AccountInfo accountInfoDTO = await _tradingProvider.GetAccountInfo(_settings.Pairs);
 
             foreach (Asset asset in accountInfoDTO.Assets)
             {
@@ -164,7 +169,7 @@ namespace SmartExchange.Business
         }
         private async Task LogAssetsAsync()
         {
-            AccountInfo accountInfoDTO = await _tradingProvider.GetAccountInfo(_settings.Assets);
+            AccountInfo accountInfoDTO = await _tradingProvider.GetAccountInfo(_settings.Pairs);
 
             await _dbContext.LogAccountAssets(accountInfoDTO);
         }

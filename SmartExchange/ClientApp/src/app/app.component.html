@@ -1,10 +1,15 @@
-<div class="container" *ngIf="data">
+<div class="container pt-2" *ngIf="data">
   <div class="d-flex justify-content-between align-items-center">
     <div class="flex-grow-1">
       <div>
-        <h2>Current Asset: {{ data.fromAsset.name }}</h2>
+        <h2>Current asset: {{ data.fromAsset.name }}</h2>
         <p>Quantity: {{ data.fromAsset.quantity }}</p>
         <p>
+          USDT quantity:
+          {{ data.fromAsset.totalQuantityUSDT | number : "1.4-4" }}
+        </p>
+        <p>
+          Last update:
           {{ data.fromAsset.dateCreatedLocal | date : "yyyy-MM-dd HH:mm:ss" }}
         </p>
       </div>
@@ -147,14 +152,16 @@
                 </span>
               </td>
               <td>
+                {{ pair.totalQuantityUSDT | number : "1.4-4" }}
+                (
                 <span
                   [ngClass]="{
                     'bg-light text-success': pair.profitQuantityUSDT > 0,
                     'bg-light text-danger': pair.profitQuantityUSDT < 0
                   }"
                 >
-                  {{ pair.profitQuantityUSDT | number : "1.4-4" }}
-                </span>
+                  {{ pair.profitQuantityUSDT | number : "1.4-4" }} </span
+                >)
               </td>
             </tr>
           </tbody>

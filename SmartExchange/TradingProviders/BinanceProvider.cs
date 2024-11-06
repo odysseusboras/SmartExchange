@@ -22,7 +22,7 @@ namespace SmartExchange.TradingProviders
             _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
         }
 
-        public async Task<AccountInfo> GetAccountInfo(List<ConfigPair> configPairs)
+        public async Task<AccountInfo> GetAccountInfo(List<ConfigPair>? configPairs = null)
         {
             long timestamp = GetTimestamp();
 
@@ -64,7 +64,7 @@ namespace SmartExchange.TradingProviders
                      .ToList();
 
             res = res
-                .Where(x => configPairs.Exists(c => c.Name.Contains(x.Name)) && x.Quantity > 0)
+                .Where(x => configPairs is null || (configPairs.Exists(c => c.Name.Contains(x.Name)) && x.Quantity > 0))
                 .ToList();
 
             return new AccountInfo
@@ -73,7 +73,7 @@ namespace SmartExchange.TradingProviders
             };
         }
 
-        public async Task<IEnumerable<PairInfo>> GetAllPairs(List<ConfigPair> configPairs)
+        public async Task<IEnumerable<PairInfo>> GetAllPairs(List<ConfigPair>? configPairs = null)
         {
             HttpResponseMessage response = await _httpClient.GetAsync("/api/v3/exchangeInfo");
             _ = response.EnsureSuccessStatusCode();
@@ -88,7 +88,7 @@ namespace SmartExchange.TradingProviders
             {
                 string pairName = symbolElement.GetProperty("symbol").GetString() ?? throw new Exception("Symbol is empty");
                 string baseAsset = symbolElement.GetProperty("baseAsset").GetString() ?? throw new Exception("Asset is empty");
-                if (!configPairs.Any(c => string.Equals(c.Name, pairName, StringComparison.OrdinalIgnoreCase)))
+                if (configPairs is not null && !configPairs.Any(c => string.Equals(c.Name, pairName, StringComparison.OrdinalIgnoreCase)))
                 {
                     continue;
                 }

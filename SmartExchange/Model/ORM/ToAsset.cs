@@ -18,7 +18,8 @@ namespace SmartExchange.Model.ORM
         public decimal TargetQuantity { get; set; } = 0;
         public decimal CurrentQuantity { get; set; } = 0;
         public decimal CurrentQuantityWithFee { get; set; } = 0;
-        public decimal profitQuantityUSDT { get; set; } = 0;
+        public decimal ProfitQuantityUSDT { get; set; } = 0;
+        public decimal TotalQuantityUSDT { get; set; } = 0;
         public TransactionAction Action { get; set; }
         public bool Selected { get; set; } = false;
         public decimal PricePercentageDiff { get; set; } = 0;
@@ -78,7 +79,8 @@ namespace SmartExchange.Model.ORM
             CurrentQuantityWithFee = CurrentQuantity - (CurrentQuantity * 0.001M);
             TargetQuantity = (TargetQuantity != 0) ? TargetQuantity : Math.Max(CurrentQuantity, maxQuantity);
             PricePercentageDiff = Math.Abs(CurrentPrice - TradePrice) / TradePrice;
-            profitQuantityUSDT = (TradeQuantity == 0) ? 0 : USDTprice * (CurrentQuantityWithFee - TargetQuantity);
+            ProfitQuantityUSDT = (TradeQuantity == 0) ? 0 : USDTprice * (CurrentQuantityWithFee - TargetQuantity);
+            TotalQuantityUSDT = (CurrentQuantity == 0) ? 0 : USDTprice * CurrentQuantity;
             QuantityPercentageDiff = (CurrentQuantity == 0) ? 0 : (CurrentQuantityWithFee - TargetQuantity) / TargetQuantity;
             ThresholdBuy = thresholdBuy;
             ThresholdSell = thresholdSell;
@@ -103,7 +105,8 @@ namespace SmartExchange.Model.ORM
                 CurrentQuantityWithFee = CurrentQuantityWithFee,
                 CurrentQuantity = CurrentQuantity,
                 FromAsset = FromAsset,
-                profitQuantityUSDT = profitQuantityUSDT,
+                ProfitQuantityUSDT = ProfitQuantityUSDT,
+                TotalQuantityUSDT = TotalQuantityUSDT,
                 QuantityPercentageDiff = QuantityPercentageDiff,
                 ThresholdSell = ThresholdSell,
                 ThresholdBuy = ThresholdBuy,
@@ -131,7 +134,10 @@ namespace SmartExchange.Model.ORM
             _ = builder.Property(e => e.PricePercentageDiff)
                 .HasPrecision(20, 8);
 
-            _ = builder.Property(e => e.profitQuantityUSDT)
+            _ = builder.Property(e => e.ProfitQuantityUSDT)
+                .HasPrecision(20, 8);
+
+            _ = builder.Property(e => e.TotalQuantityUSDT)
                 .HasPrecision(20, 8);
 
             _ = builder.Property(t => t.Action).HasConversion(new EnumToStringConverter<TransactionAction>());
