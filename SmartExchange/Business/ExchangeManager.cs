@@ -129,13 +129,11 @@ namespace SmartExchange.Business
         {
             await _dbContext.LogTransaction(fromAsset);
 
-            ToAsset toAsset = fromAsset.ToAssets.First(x => x.Selected);
+            Thread.Sleep(100);
 
-            fromAsset = new() { Name = toAsset.Name, Quantity = 0 };
+            _ = await GetStartingAsset();
 
             await RunAsync();
-
-            await SetFromAssetQuantityAsync();
 
             await LogAssetsAsync();
 
@@ -170,14 +168,7 @@ namespace SmartExchange.Business
 
             await _dbContext.LogAccountAssets(accountInfoDTO);
         }
-        private async Task SetFromAssetQuantityAsync()
-        {
-            AccountInfo accountInfoDTO = await _tradingProvider.GetAccountInfo(_settings.Assets);
 
-            Asset? asset = accountInfoDTO.Assets.FirstOrDefault(x => x.Name == fromAsset.Name);
-
-            fromAsset.Quantity = asset?.Quantity ?? 0;
-        }
 
         #endregion
     }

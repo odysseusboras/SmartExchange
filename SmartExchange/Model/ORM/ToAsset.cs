@@ -38,7 +38,7 @@ namespace SmartExchange.Model.ORM
             get
             {
                 decimal quantity = FromAsset?.Quantity ?? 0;
-                return quantity == 0 ? 0 : Action == TransactionAction.Sell ? TargetQuantity / quantity : quantity / TargetQuantity;
+                return quantity == 0 || TargetQuantity == 0 ? 0 : Action == TransactionAction.Sell ? TargetQuantity / quantity : quantity / TargetQuantity;
             }
             set { }
         }
@@ -59,8 +59,8 @@ namespace SmartExchange.Model.ORM
 
         public void SetValues(decimal price, decimal USDTprice, Dictionary<string, decimal> maxQuantities, decimal thresholdSell, decimal thresholdBuy)
         {
-            CurrentPrice = price;
             PreviousPrice = CurrentPrice;
+            CurrentPrice = price;
             TradePrice = (TradePrice == 0) ? CurrentPrice : TradePrice;
 
             _ = maxQuantities.TryGetValue(Name, out decimal maxQuantity);

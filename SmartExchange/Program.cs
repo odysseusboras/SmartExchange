@@ -21,7 +21,7 @@ namespace SmartExchange
                .ConfigureWebHostDefaults(webBuilder =>
                {
 #if DEBUG
-                   webBuilder.UseUrls("http://localhost:5000");
+                   webBuilder.UseUrls("http://localhost:5001");
 #else
                    webBuilder.UseUrls("http://localhost:5001");
 #endif          
