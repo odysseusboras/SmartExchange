@@ -33,7 +33,7 @@ namespace SmartExchange.Model.ORM
         public decimal ThresholdBuy { get; set; } = 0;
         public decimal ThresholdSell { get; set; } = 0;
         [NotMapped]
-        public decimal TargetPrice { get => TargetQuantity / FromAsset?.Quantity ?? throw new Exception("From asset cannot be empty"); set { } }
+        public decimal TargetPrice { get => Action == TransactionAction.Sell ? TargetQuantity / FromAsset.Quantity : FromAsset.Quantity / TargetQuantity; set { } }
 
         [NotMapped]
         public string ActionName { get => Action.ToString(); set { } }
@@ -52,14 +52,14 @@ namespace SmartExchange.Model.ORM
         public void SetValues(decimal price, decimal USDTprice, Dictionary<string, decimal> maxQuantities, decimal thresholdSell, decimal thresholdBuy)
         {
             _ = maxQuantities.TryGetValue(Name, out decimal maxQuantity);
-            decimal toQuantity = Action == TransactionAction.Buy ? MathExtensions.Round(FromAsset?.Quantity ?? 0 / price, StepSize) : MathExtensions.Round(FromAsset?.Quantity ?? 0, StepSize);
+            decimal toQuantity = Action == TransactionAction.Buy ? FromAsset?.Quantity ?? 0 / price : MathExtensions.Round(FromAsset?.Quantity ?? 0, StepSize);
             TradePrice = (TradePrice == 0) ? price : TradePrice;
             TradeQuantity = toQuantity;
             PreviousPrice = CurrentPrice;
             CurrentPrice = price;
-            CurrentQuantity = Action == TransactionAction.Sell ? CurrentPrice * TradeQuantity : MathExtensions.Round(FromAsset?.Quantity ?? 0 / CurrentPrice, StepSize);
+            CurrentQuantity = Action == TransactionAction.Sell ? CurrentPrice * TradeQuantity : MathExtensions.Round(TradeQuantity / CurrentPrice, StepSize);
             CurrentQuantityWithFee = CurrentQuantity - (CurrentQuantity * 0.001M);
-            TargetQuantity = (maxQuantity == 0) ? Math.Max(CurrentQuantity, maxQuantity) : maxQuantity;
+            TargetQuantity = (TargetQuantity != 0) ? TargetQuantity : (maxQuantity == 0) ? Math.Max(CurrentQuantity, maxQuantity) : maxQuantity;
             PricePercentageDiff = Math.Abs(CurrentPrice - TradePrice) / TradePrice;
             profitQuantityUSDT = (TradeQuantity == 0) ? 0 : USDTprice * (CurrentQuantityWithFee - TargetQuantity);
             QuantityPercentageDiff = (CurrentQuantity == 0) ? 0 : (CurrentQuantityWithFee - TargetQuantity) / TargetQuantity;

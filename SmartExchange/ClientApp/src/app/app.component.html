@@ -105,7 +105,7 @@
                   <i *ngIf="pair.priceUp" class="fas fa-arrow-down"></i>
                   <i *ngIf="!pair.priceUp" class="fas fa-arrow-up"></i>
                 </span>
-                {{ pair.tradePrice | number : "1.8-8" }}
+                {{ pair.tradePrice | number : "1.10-10" }}
               </td>
               <td>
                 <span
@@ -115,12 +115,12 @@
                     'bg-light text-danger': pair.currentPrice < pair.targetPrice
                   }"
                 >
-                  {{ pair.currentPrice | number : "1.8-8" }}
+                  {{ pair.currentPrice | number : "1.10-10" }}
                 </span>
-                ({{ pair.pricePercentageDiff * 100 | number : "1.2-2" }}%)
+                ({{ pair.pricePercentageDiff * 100 | number : "1.4-4" }}%)
               </td>
               <td>
-                {{ pair.targetPrice | number : "1.8-8" }}
+                {{ pair.targetPrice | number : "1.10-10" }}
               </td>
               <td>
                 <span>
@@ -150,7 +150,7 @@
               </td>
               <td>
                 <span>
-                  {{ pair.quantityPercentageDiff * 100 | number : "1.2-2" }}% /
+                  {{ pair.quantityPercentageDiff * 100 | number : "1.4-4" }}% /
                   <span *ngIf="pair.actionName === 'Sell'">
                     {{ pair.thresholdSell * 100 }}%
                   </span>
@@ -166,7 +166,7 @@
                     'bg-light text-danger': pair.profitQuantityUSDT < 0
                   }"
                 >
-                  {{ pair.profitQuantityUSDT | number : "1.2-2" }}
+                  {{ pair.profitQuantityUSDT | number : "1.4-4" }}
                 </span>
               </td>
             </tr>
